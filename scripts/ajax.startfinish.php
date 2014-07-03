@@ -30,8 +30,8 @@ require_once 'lib/location.class.php';
 
 $startDate = new DateTime(Settings::START_DATE, new DateTimeZone(Settings::TIMEZONE));
 $now = new DateTime(null, new DateTimeZone(Settings::TIMEZONE));
-$interval = $startDate->diff($now);
-$day = (int)$interval->format('%a') + 1;
+$intervalSecs = $now->format('U') - $startDate->format('U');
+$day = (int)($intervalSecs/(3600*24)) + 1;
 $location = new Location();
 
 $route = $location->getStartFinish($day);

@@ -72,8 +72,8 @@ class Location
             return false;
         }
 
-        $theDate = new DateTime(null, new DateTimeZone(Settings::TIMEZONE));
-        $theDate->setTimestamp($timestamp/1000);
+        $ts = $timestamp/1000;
+        $theDate = new DateTime("@$ts", new DateTimeZone(Settings::TIMEZONE));
 
         try {
             $lastPoint = $this->_getLastStoredPoint($theDate);
@@ -82,10 +82,8 @@ class Location
                 $newDistance = $this->haversine($lastPoint['lat'], $lastPoint['lng'], $latitude, $longitude);
                 $distance = $lastPoint['distance'] + ($newDistance * Settings::KM_TO_MILES);
 
-                $previousDataTime = new DateTime($lastPoint['datatime'], new DateTimeZone(Settings::TIMEZONE));
-                $interval = $theDate->diff($previousDataTime);
-                $secondsPassed = $interval->format('%s');
-
+                $previousDataTime = new DateTime($lastPoint['datatime'], new DateTimeZone('UTC'));
+                $secondsPassed = $theDate->format('U') - $previousDataTime->format('U');
                 $speedMPS = ($newDistance * 1000) / $secondsPassed;
                 $speed = $speedMPS * Settings::MPS_TO_MPH;
                 $heading = $this->getRhumbLineBearing($lastPoint['lat'], $lastPoint['lng'], $latitude, $longitude);
